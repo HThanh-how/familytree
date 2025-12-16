@@ -11,7 +11,7 @@ interface FamilyTreeProps {
     searchInInfo?: boolean;
 }
 
-// 创建一个映射，用于快速查找人物
+// Create a map for quick person lookup
 const createPersonMap = (data: FamilyData) => {
     const map = new Map<string, Person>();
     data.generations.forEach(generation => {
@@ -24,11 +24,11 @@ const createPersonMap = (data: FamilyData) => {
     return map;
 };
 
-// 创建一个映射，用于查找一个人的所有儿子
+// Create a map for looking up a person's children
 const createSonsMap = (data: FamilyData) => {
     const map = new Map<string, Person[]>();
     
-    // 初始化每个人的儿子数组
+    // Initialize children array for each person
     data.generations.forEach(generation => {
         generation.people.forEach(person => {
             if (person.id) {
@@ -37,10 +37,10 @@ const createSonsMap = (data: FamilyData) => {
         });
     });
     
-    // 根据 fatherId 填充儿子数组（包含所有儿子）
+    // Fill children array based on fatherId
     data.generations.forEach(generation => {
         generation.people.forEach(person => {
-            // 任何有fatherId的人都被认为是其父亲的儿子
+            // Anyone with fatherId is considered that father's child
             if (person.fatherId && map.has(person.fatherId)) {
                 const sons = map.get(person.fatherId) || [];
                 sons.push(person);
@@ -72,7 +72,7 @@ const PersonCard = ({
     const sons = person.id ? sonsMap.get(person.id) || [] : [];
 
     const toggleExpand = (e: React.MouseEvent) => {
-        // 防止点击按钮时触发卡片展开
+        // Prevent toggling card when clicking on buttons
         if ((e.target as HTMLElement).tagName === 'BUTTON' || 
             (e.target as HTMLElement).closest('button')) {
             return;
@@ -90,8 +90,21 @@ const PersonCard = ({
             <div className="relative">
                 <div className="flex items-center justify-between gap-3 mb-3">
                     <div className="flex items-center gap-3">
-                        <div className="bg-blue-50 p-2 rounded-lg group-hover:bg-blue-100 transition-colors duration-300">
-                            <UserIcon className="h-5 w-5 text-blue-600" />
+                        {/* Avatar: use image if avatarUrl exists, otherwise use initial */}
+                        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 text-blue-700 font-semibold border border-blue-100 overflow-hidden group-hover:bg-blue-100 transition-colors duration-300">
+                            {person.avatarUrl ? (
+                                <img
+                                    src={person.avatarUrl}
+                                    alt={person.name}
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <span>
+                                    {person.name && person.name.length > 0
+                                        ? person.name.charAt(0)
+                                        : <UserIcon className="h-5 w-5 text-blue-600" />}
+                                </span>
+                            )}
                         </div>
                         <h3 className="text-xl font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-300">
                             <span dangerouslySetInnerHTML={{ 
@@ -110,7 +123,7 @@ const PersonCard = ({
                 {father && (
                     <div className="flex items-center gap-2 text-gray-600 text-sm mb-2">
                         <UserGroupIcon className="h-4 w-4 text-blue-500" />
-                        <span>父亲：</span>
+                        <span>Cha:</span>
                         <button 
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -128,7 +141,7 @@ const PersonCard = ({
                 {sons.length > 0 && (
                     <div className="flex flex-wrap items-center gap-2 text-gray-600 text-sm mb-2">
                         <UserGroupIcon className="h-4 w-4 text-green-500" />
-                        <span>子嗣：</span>
+                        <span>Con cháu:</span>
                         {sons.map((son, index) => (
                             <span key={son.id || index}>
                                 <button 
@@ -223,7 +236,7 @@ export default function FamilyTree({ familyData, searchTerm, searchInInfo }: Fam
         const element = document.getElementById(`person-${personId}`);
         if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // 添加一个临时高亮效果
+            // Add a temporary highlight effect
             element.classList.add('ring-2', 'ring-blue-500');
             setTimeout(() => {
                 element.classList.remove('ring-2', 'ring-blue-500');

@@ -13,14 +13,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// 从环境变量中获取姓氏
+// Get family name from environment
 const familyName = process.env.NEXT_PUBLIC_FAMILY_NAME || '姓氏';
-// 从环境变量中获取谷歌统计ID
+// Get Google Analytics ID from environment
 const googleAnalyticsId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
 
 export const metadata: Metadata = {
-  title: `${familyName}氏族谱`,
-  description: `${familyName}氏家族族谱记录`,
+  title: `Gia phả họ ${familyName}`,
+  description: `Trang gia phả của dòng họ ${familyName}`,
   robots: {
     index: false,
     follow: false,
@@ -39,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN">
+    <html lang="vi">
       <head>
         <meta name="robots" content="noindex,nofollow" />
         <meta name="googlebot" content="noindex,nofollow" />

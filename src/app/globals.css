@@ -12,6 +12,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Base dark-mode variables, can be overridden by explicit theme toggle */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -19,8 +20,31 @@
   }
 }
 
+/* Explicit theme from React (data-theme="dark" on html) */
+html[data-theme='dark'] {
+  --background: #020617;
+  --foreground: #e5e7eb;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Override common Tailwind background/text utilities in dark mode */
+html[data-theme='dark'] body .bg-white {
+  background-color: #020617 !important;
+}
+
+html[data-theme='dark'] body .bg-gray-50 {
+  background-color: #020617 !important;
+}
+
+html[data-theme='dark'] body .text-gray-800 {
+  color: #e5e7eb !important;
+}
+
+html[data-theme='dark'] body .text-gray-900 {
+  color: #f9fafb !important;
 }

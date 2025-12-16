@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react';
 import { FamilyData } from '../types/family';
 
-// 默认的空数据结构
+// Default empty family data
 const defaultFamilyData: FamilyData = {
   generations: []
 };
 
-// 用于在客户端获取家族数据的钩子
+// Hook for fetching family data on client
 export function useFamilyData(): { 
   data: FamilyData; 
   loading: boolean; 
@@ -23,20 +23,20 @@ export function useFamilyData(): {
       try {
         setLoading(true);
         
-        // 从新的 API 端点获取数据
+        // Fetch data from API endpoint
         const response = await fetch('/api/family-data');
         
         if (!response.ok) {
-          throw new Error(`API返回错误状态: ${response.status}`);
+          throw new Error(`API returned error status: ${response.status}`);
         }
         
         const fetchedData = await response.json();
         setData(fetchedData);
         setError(null);
       } catch (err) {
-        console.error('获取家族数据失败:', err);
-        setError('加载家族数据失败，使用默认数据');
-        // 出错时使用默认数据
+        console.error('Failed to fetch family data:', err);
+        setError('Tải dữ liệu gia phả thất bại, đang dùng dữ liệu mặc định');
+        // On error, fall back to default data
         setData(defaultFamilyData);
       } finally {
         setLoading(false);
@@ -49,5 +49,5 @@ export function useFamilyData(): {
   return { data, loading, error };
 }
 
-// 导出默认数据，以便在需要时使用
+// Export default data for optional usage
 export const familyDataWithIds = defaultFamilyData; 

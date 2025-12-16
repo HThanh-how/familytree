@@ -31,7 +31,7 @@ export default function SearchBar({ onSearch, generations }: SearchBarProps) {
     
     const filtersPanelRef = useRef<HTMLDivElement>(null);
 
-    // 使用useCallback优化函数
+    // Use useCallback to optimize handlers
     const handleSearch = useCallback((newSearchTerm?: string, newFilters?: Partial<SearchFilters>) => {
         const currentSearchTerm = newSearchTerm !== undefined ? newSearchTerm : searchTerm;
         const currentFilters = { ...filters, ...newFilters, searchTerm: currentSearchTerm };
@@ -60,7 +60,7 @@ export default function SearchBar({ onSearch, generations }: SearchBarProps) {
         handleSearch(undefined, { selectedGenerations: newSelectedGenerations });
     }, [filters.selectedGenerations, handleSearch]);
 
-    // 使用useMemo缓存计算结果
+    // Use useMemo to cache computed result
     const hasActiveFilters = useMemo(() => 
         filters.selectedGenerations.length > 0 || 
         Boolean(filters.yearRange.start) || 
@@ -68,7 +68,7 @@ export default function SearchBar({ onSearch, generations }: SearchBarProps) {
         !filters.searchInInfo
     , [filters]);
 
-    // 点击外部关闭筛选面板
+    // Close filter panel when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (filtersPanelRef.current && !filtersPanelRef.current.contains(event.target as Node)) {
@@ -87,7 +87,7 @@ export default function SearchBar({ onSearch, generations }: SearchBarProps) {
 
     return (
         <div className="relative flex items-center" ref={filtersPanelRef}>
-            {/* 与按钮组统一风格的搜索框 */}
+            {/* Search input with same style as view buttons */}
             <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <MagnifyingGlassIcon className="h-4 w-4 text-gray-400" />
@@ -95,7 +95,7 @@ export default function SearchBar({ onSearch, generations }: SearchBarProps) {
                 <input
                     type="text"
                     className={`${UI_CONFIG.SEARCH_INPUT_WIDTH} pl-9 pr-8 py-2 bg-white border border-gray-200 rounded-md text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:border-blue-200 shadow-sm transition-colors`}
-                    placeholder="搜索"
+                    placeholder="Tìm kiếm"
                     value={searchTerm}
                     onChange={(e) => {
                         setSearchTerm(e.target.value);
@@ -112,7 +112,7 @@ export default function SearchBar({ onSearch, generations }: SearchBarProps) {
                 )}
             </div>
             
-            {/* 筛选按钮 - 与视图按钮风格一致 */}
+            {/* Filter button - same style as view buttons */}
             <button
                 onClick={() => setShowFilters(!showFilters)}
                 className={`ml-1 px-3 py-2 text-sm font-medium border rounded-md flex items-center shadow-sm transition-colors ${
@@ -127,13 +127,13 @@ export default function SearchBar({ onSearch, generations }: SearchBarProps) {
                 )}
             </button>
 
-            {/* 筛选面板 */}
+            {/* Filter panel */}
             {showFilters && (
                 <div className={`absolute top-full left-0 mt-2 ${UI_CONFIG.FILTER_PANEL_WIDTH} bg-white rounded-lg shadow-lg border border-gray-200 z-10`}>
                     <div className="p-4 space-y-3">
-                        {/* 搜索选项 */}
+                        {/* Search options */}
                         <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-700">包含详细信息</span>
+                            <span className="text-gray-700">Bao gồm phần mô tả chi tiết</span>
                             <input
                                 type="checkbox"
                                 checked={filters.searchInInfo}
@@ -142,10 +142,12 @@ export default function SearchBar({ onSearch, generations }: SearchBarProps) {
                             />
                         </div>
 
-                        {/* 世代筛选 */}
+                        {/* Generation filter */}
                         {generations.length > 0 && (
                             <div>
-                                <h4 className="text-sm font-medium text-gray-700 mb-2">世代</h4>
+                                <h4 className="text-sm font-medium text-gray-700 mb-2">
+                                    Đời (thế hệ)
+                                </h4>
                                 <div className="flex flex-wrap gap-1">
                                     {generations.map((generation) => (
                                         <button
@@ -164,13 +166,15 @@ export default function SearchBar({ onSearch, generations }: SearchBarProps) {
                             </div>
                         )}
 
-                        {/* 年份范围 */}
+                        {/* Year range */}
                         <div>
-                            <h4 className="text-sm font-medium text-gray-700 mb-2">年份</h4>
+                            <h4 className="text-sm font-medium text-gray-700 mb-2">
+                                Năm sinh/mất
+                            </h4>
                             <div className="flex items-center gap-2">
                                 <input
                                     type="number"
-                                    placeholder="起始"
+                                    placeholder="Từ năm"
                                     className="flex-1 px-2 py-1 border border-gray-200 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-300"
                                     value={filters.yearRange.start || ''}
                                     onChange={(e) => handleSearch(undefined, { 
@@ -180,7 +184,7 @@ export default function SearchBar({ onSearch, generations }: SearchBarProps) {
                                 <span className="text-gray-400 text-xs">-</span>
                                 <input
                                     type="number"
-                                    placeholder="结束"
+                                    placeholder="Đến năm"
                                     className="flex-1 px-2 py-1 border border-gray-200 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-300"
                                     value={filters.yearRange.end || ''}
                                     onChange={(e) => handleSearch(undefined, { 
@@ -196,7 +200,7 @@ export default function SearchBar({ onSearch, generations }: SearchBarProps) {
                                     onClick={clearSearch}
                                     className="text-xs text-gray-600 hover:text-gray-800 underline"
                                 >
-                                    清除所有筛选
+                                    Xoá toàn bộ bộ lọc
                                 </button>
                             </div>
                         )}

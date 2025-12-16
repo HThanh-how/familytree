@@ -3,21 +3,23 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import FamilyTree from './components/FamilyTree';
 import TreeView from './components/TreeView';
+import BinaryTreeView from './components/BinaryTreeView';
 import Footer from './components/Footer';
 import LoginForm from './components/LoginForm';
 import SearchBar, { SearchFilters } from './components/SearchBar';
 import { useFamilyData } from '../data/familyDataWithIds';
-import { QueueListIcon, Squares2X2Icon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
+import { QueueListIcon, Squares2X2Icon, ArrowRightOnRectangleIcon, SunIcon, MoonIcon, RectangleGroupIcon } from '@heroicons/react/24/outline';
 import { getPublicConfig, getFamilyFullName } from '@/utils/config';
 import { searchFamilyData, createFilteredFamilyData, SearchResult } from '@/utils/search';
 import { buildFamilyTree } from '@/utils/familyTree';
 import { AUTH_CONFIG } from '@/utils/constants';
 
 export default function Home() {
-  const [viewMode, setViewMode] = useState<'list' | 'tree'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'tree' | 'binary'>('list');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState('');
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const { data: familyData, loading: dataLoading, error: dataError } = useFamilyData();
   
   // Search related state
@@ -89,7 +91,40 @@ export default function Home() {
     setIsAuthenticated(false);
   }, []);
 
+  // Theme toggle handler - manage light/dark mode
+  const applyTheme = useCallback((dark: boolean) => {
+    const root = document.documentElement;
+    root.setAttribute('data-theme', dark ? 'dark' : 'light');
+    setIsDarkMode(dark);
+    try {
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    } catch {
+      // Ignore storage errors
+    }
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    applyTheme(!isDarkMode);
+  }, [applyTheme, isDarkMode]);
+
   useEffect(() => {
+    // Initialize theme from localStorage or system preference
+    try {
+      const storedTheme = localStorage.getItem('theme');
+      if (storedTheme === 'dark') {
+        applyTheme(true);
+      } else if (storedTheme === 'light') {
+        applyTheme(false);
+      } else if (window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        applyTheme(true);
+      } else {
+        applyTheme(false);
+      }
+    } catch {
+      applyTheme(false);
+    }
+
     // 始终假设需要登录验证 - 真实的验证会在服务器端处理
     
     // 检查是否已经验证过 - 使用常量
@@ -140,31 +175,46 @@ export default function Home() {
 
   // 已验证或不需要登录，显示家谱内容
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white shadow-sm mb-4">
+    <main className="min-h-screen bg-gray-50 flex flex-col transition-colors duration-300">
+      <header className="bg-white shadow-sm mb-4 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 py-6 relative">
-          {/* 只有在需要登录且已登录的情况下才显示退出按钮 */}
-          {requireAuth && isAuthenticated && (
-            <div className="absolute right-4 top-4">
+          {/* Top-right theme toggle and logout button */}
+          <div className="absolute right-4 top-4">
+            <div className="flex items-center gap-2">
+              {/* Theme toggle button */}
               <button
-                onClick={handleLogout}
-                className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                type="button"
+                onClick={toggleTheme}
+                className="inline-flex items-center justify-center px-2 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
               >
-                <ArrowRightOnRectangleIcon className="h-4 w-4 mr-1" />
-                退出
+                {isDarkMode ? (
+                  <SunIcon className="h-4 w-4 text-yellow-500" />
+                ) : (
+                  <MoonIcon className="h-4 w-4 text-gray-600" />
+                )}
               </button>
+              {requireAuth && isAuthenticated && (
+                <button
+                  onClick={handleLogout}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  <ArrowRightOnRectangleIcon className="h-4 w-4 mr-1" />
+                  Thoát
+                </button>
+              )}
             </div>
-          )}
+          </div>
           
           <h1 className="text-3xl font-bold text-gray-900 text-center">
-            {familyFullName}族谱
+            Gia phả họ {familyFullName}
           </h1>
           <p className="mt-2 text-gray-500 text-center text-sm tracking-wide">
-            传承历史 · 延续文化
+            Lưu truyền lịch sử · Gìn giữ văn hoá
           </p>
           {requireAuth && userName && (
             <p className="mt-1 text-blue-500 text-center text-xs">
-              欢迎您，{familyFullName}族人
+              Chào mừng bạn, hậu duệ họ {familyFullName}
             </p>
           )}
           <div className="mt-6 flex justify-center">
@@ -179,11 +229,11 @@ export default function Home() {
                 onClick={() => setViewMode('list')}
               >
                 <QueueListIcon className="h-4 w-4 mr-2" />
-                列表视图
+                Dạng danh sách
               </button>
               <button
                 type="button"
-                className={`px-4 py-2 text-sm font-medium rounded-r-md flex items-center ${
+                className={`px-4 py-2 text-sm font-medium flex items-center border-l-0 ${
                   viewMode === 'tree'
                     ? 'bg-blue-50 text-blue-700 border border-blue-200'
                     : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
@@ -191,7 +241,19 @@ export default function Home() {
                 onClick={() => setViewMode('tree')}
               >
                 <Squares2X2Icon className="h-4 w-4 mr-2" />
-                树状视图
+                Dạng cây
+              </button>
+              <button
+                type="button"
+                className={`px-4 py-2 text-sm font-medium rounded-r-md flex items-center border-l-0 ${
+                  viewMode === 'binary'
+                    ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                }`}
+                onClick={() => setViewMode('binary')}
+              >
+                <RectangleGroupIcon className="h-4 w-4 mr-2" />
+                Cây nhị phân
               </button>
             </div>
           </div>
@@ -206,7 +268,7 @@ export default function Home() {
         )}
         
         <div className="max-w-7xl mx-auto px-4 mb-6">
-          {/* 搜索框 */}
+          {/* Search box */}
           <div className="flex justify-end mb-4">
             <SearchBar 
               onSearch={handleSearch}
@@ -214,31 +276,39 @@ export default function Home() {
             />
           </div>
           
-          {/* 搜索结果提示 */}
+          {/* Search result tips */}
           {searchResults.length === 0 && (searchTerm || searchFilters.selectedGenerations.length > 0 || 
            searchFilters.yearRange.start || searchFilters.yearRange.end) && (
             <div className="text-center text-gray-500 py-8">
-              <p className="text-lg">未找到匹配的家族成员</p>
-              <p className="text-sm">请尝试修改搜索条件</p>
+              <p className="text-lg">Không tìm thấy thành viên phù hợp</p>
+              <p className="text-sm">Hãy thử thay đổi điều kiện tìm kiếm</p>
             </div>
           )}
           
           {searchResults.length > 0 && (
             <div className="text-sm text-gray-600 text-center mb-4">
-              找到 <span className="font-medium text-blue-600">{searchResults.length}</span> 个匹配结果
+              Tìm thấy <span className="font-medium text-blue-600">{searchResults.length}</span> kết quả phù hợp
             </div>
           )}
         </div>
         
-        {viewMode === 'list' ? (
-          <FamilyTree 
-            familyData={filteredFamilyData} 
+        {viewMode === 'list' && (
+          <FamilyTree
+            familyData={filteredFamilyData}
             searchTerm={searchTerm}
             searchInInfo={searchFilters.searchInInfo}
           />
-        ) : (
-          <TreeView 
-            data={treeData} 
+        )}
+        {viewMode === 'tree' && (
+          <TreeView
+            data={treeData}
+            searchTerm={searchTerm}
+            searchInInfo={searchFilters.searchInInfo}
+          />
+        )}
+        {viewMode === 'binary' && (
+          <BinaryTreeView
+            data={treeData}
             searchTerm={searchTerm}
             searchInInfo={searchFilters.searchInInfo}
           />
