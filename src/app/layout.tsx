@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 // Get family name from environment
-const familyName = process.env.NEXT_PUBLIC_FAMILY_NAME || '姓氏';
+const familyName = process.env.NEXT_PUBLIC_FAMILY_NAME || 'Bạch';
 // Get Google Analytics ID from environment
 const googleAnalyticsId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
 

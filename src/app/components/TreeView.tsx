@@ -111,21 +111,8 @@ const TreeNode = ({ person, level, searchTerm, searchInInfo, firstMatchId }: Tre
         )}
         
         <div className="flex items-center">
-          {/* Avatar: use image if avatarUrl exists, otherwise use initial */}
-          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-700 font-semibold border border-blue-100 overflow-hidden mr-2 group-hover:bg-blue-100 transition-colors duration-300">
-            {person.avatarUrl ? (
-              <img
-                src={person.avatarUrl}
-                alt={person.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span>
-                {person.name && person.name.length > 0
-                  ? person.name.charAt(0)
-                  : <UserIcon className="h-4 w-4 text-blue-600" />}
-              </span>
-            )}
+          <div className="bg-blue-50 p-1 rounded-md mr-2 group-hover:bg-blue-100 transition-colors duration-300">
+            <UserIcon className="h-4 w-4 text-blue-600" />
           </div>
           <div>
             <span className="font-medium text-gray-800">
@@ -215,7 +202,7 @@ export default function TreeView({ data, searchTerm, searchInInfo }: TreeViewPro
   return (
     <div className="max-w-7xl mx-auto px-4">
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-6">Sơ đồ cây gia phả</h2>
+        <h2 className="text-xl font-bold text-gray-800 mb-6">家族树状图</h2>
         <div className="overflow-x-auto">
           {rootPeople.map((person, index) => (
             <TreeNode 

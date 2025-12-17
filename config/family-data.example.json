@@ -1,13 +1,13 @@
 {
   "generations": [
     {
-      "title": "世代名称",
+      "title": "Tên thế hệ",
       "people": [
         {
-          "id": "person-id",
-          "name": "姓名",
-          "info": "人物描述",
-          "fatherId": "父亲ID",
+          "id": "ma-dinh-danh",
+          "name": "Họ tên",
+          "info": "Mô tả về người này",
+          "fatherId": "ID cha",
           "birthYear": 1900,
           "deathYear": 1980
         }

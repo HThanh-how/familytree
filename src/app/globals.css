@@ -32,6 +32,31 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Custom scrollbar for tree view containers */
+.tree-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af #e5e7eb;
+}
+
+.tree-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.tree-scroll::-webkit-scrollbar-track {
+  background: #e5e7eb;
+  border-radius: 9999px;
+}
+
+.tree-scroll::-webkit-scrollbar-thumb {
+  background-color: #9ca3af;
+  border-radius: 9999px;
+}
+
+.tree-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: #6b7280;
+}
+
 /* Override common Tailwind background/text utilities in dark mode */
 html[data-theme='dark'] body .bg-white {
   background-color: #020617 !important;
