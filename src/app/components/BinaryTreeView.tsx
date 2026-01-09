@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useCallback, useEffect } from 'react';
 import { FamilyData, Person } from '@/types/family';
+import Image from 'next/image';
 import { UserIcon, CalendarIcon } from '@heroicons/react/24/outline';
 import { highlightMatch } from '@/utils/search';
 
@@ -50,20 +51,31 @@ const BinaryTreeNode = ({
     <div className="flex flex-col items-center">
       {/* Node card */}
       <div
-        className={`bg-white rounded-lg border border-gray-200 shadow-sm px-4 py-3 min-w-[160px] text-center transition-colors ${
-          matched ? 'ring-2 ring-blue-400 bg-blue-50' : ''
-        }`}
+        className={`bg-white rounded-lg border border-gray-200 shadow-sm px-4 py-3 min-w-[160px] text-center transition-colors ${matched ? 'ring-2 ring-blue-400 bg-blue-50' : ''
+          }`}
       >
         <div className="flex items-center justify-center mb-1">
-          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-700 font-semibold border border-blue-100 overflow-hidden mr-2">
-            <span>
-              {person.name && person.name.length > 0 ? (
-                person.name.charAt(0)
-              ) : (
-                <UserIcon className="h-4 w-4 text-blue-600" />
-              )}
-            </span>
-          </div>
+          {person.avatarUrl ? (
+            <div className="relative w-8 h-8">
+              <Image
+                src={person.avatarUrl}
+                alt={person.name}
+                fill
+                sizes="32px"
+                className="rounded-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-700 font-semibold border border-blue-100 overflow-hidden">
+              <span>
+                {person.name && person.name.length > 0 ? (
+                  person.name.charAt(0)
+                ) : (
+                  <UserIcon className="h-4 w-4 text-blue-600" />
+                )}
+              </span>
+            </div>
+          )}
           <span className="font-medium text-gray-800 text-sm">
             <span
               dangerouslySetInnerHTML={{

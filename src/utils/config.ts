@@ -58,14 +58,14 @@ function getAuthConfigOnServerFromEnv(): AuthConfig {
     requireAuth: process.env.NEXT_PUBLIC_REQUIRE_AUTH === 'true',
     authMode: (process.env.AUTH_MODE as 'all' | 'specific') || 'specific',
     specificName: process.env.SPECIFIC_NAME || '',
-    familyName: process.env.NEXT_PUBLIC_FAMILY_NAME || 'Họ'
+    familyName: process.env.NEXT_PUBLIC_FAMILY_NAME || '姓氏'
   };
 }
 
 // 从环境变量读取客户端公开配置
 function getPublicConfigFromEnv(): PublicConfig {
   return {
-    familyName: process.env.NEXT_PUBLIC_FAMILY_NAME || 'Họ',
+    familyName: process.env.NEXT_PUBLIC_FAMILY_NAME || '姓氏',
     isAuthRequired: process.env.NEXT_PUBLIC_REQUIRE_AUTH === 'true'
   };
 }
@@ -80,10 +80,10 @@ export async function getAuthConfigOnServer(): Promise<AuthConfig> {
   return config;
 }
 
-// 在客户端用于获取完整的姓氏名称
+// 在客户端用于获取完整的姓氏名称（带"氏"字）
 export function getFamilyFullName(): string {
   const config = getPublicConfigFromEnv();
-  return config.familyName;
+  return `${config.familyName}氏`;
 }
 
 export async function getFamilyDataOnServer(): Promise<FamilyData> {

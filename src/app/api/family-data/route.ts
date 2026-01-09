@@ -1,23 +1,48 @@
 import { NextResponse } from 'next/server';
-import path from 'path';
-import fs from 'fs';
+import prisma from '@/lib/prisma'; // Ensure this path is correct based on alias
+import redis from '@/lib/redis';
 
 export async function GET() {
   try {
-    const configPath = path.join(process.cwd(), 'config', 'family-data.json');
-    
-    // 检查文件是否存在
-    if (!fs.existsSync(configPath)) {
-      console.warn('family-data.json not found, returning empty data');
-      return NextResponse.json({
-        generations: []
-      });
+    // 1. Try to get from Cache
+    const cachedData = await redis.get('family_tree_data');
+    if (cachedData) {
+      console.log("[API] Returning cached family data");
+      return NextResponse.json(JSON.parse(cachedData));
     }
 
-    // 读取并解析文件
-    const fileContent = fs.readFileSync(configPath, 'utf8');
-    const data = JSON.parse(fileContent);
-    return NextResponse.json(data);
+    console.log("[API] Cache miss, fetching from DB...");
+
+    // 2. Fetch from DB
+    const people = await prisma.person.findMany({});
+
+    // Transform to match legacy frontend structure
+    // The frontend buildFamilyTree takes a list and builds hierarchy,
+    // so we can put everyone in one generation.
+    const transformedPeople = people.map(p => ({
+      id: p.id,
+      name: p.name,
+      info: p.info || "",
+      birthYear: p.birthYear || undefined,
+      deathYear: p.deathYear || undefined,
+      fatherId: p.fatherId || undefined,
+      avatarUrl: p.avatarUrl || undefined,
+    }));
+
+    const responseData = {
+      generations: [
+        {
+          title: "From Database",
+          people: transformedPeople
+        }
+      ]
+    };
+
+    // 3. Set Cache
+    // Store as JSON string
+    await redis.set('family_tree_data', JSON.stringify(responseData));
+
+    return NextResponse.json(responseData);
   } catch (error) {
     console.error('Error loading family data:', error);
     return NextResponse.json(
@@ -25,4 +50,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-} 
+}

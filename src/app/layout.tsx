@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
+import { Providers } from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,8 +20,13 @@ const familyName = process.env.NEXT_PUBLIC_FAMILY_NAME || 'Bạch';
 const googleAnalyticsId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
 
 export const metadata: Metadata = {
-  title: `Gia phả họ ${familyName}`,
-  description: `Trang gia phả của dòng họ ${familyName}`,
+  title: "Gia phả dòng họ - Family Tree",
+  description: "Website gia phả dòng họ trực tuyến. Lưu giữ và phát huy truyền thống gia đình. Tra cứu phả hệ, lịch sử và thông tin thành viên.",
+  openGraph: {
+    title: "Gia phả dòng họ",
+    description: "Website gia phả dòng họ trực tuyến.",
+    type: "website",
+  },
   robots: {
     index: false,
     follow: false,
@@ -47,8 +53,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
-        
+        <Providers>
+          {children}
+        </Providers>
+
         {/* Google Analytics - 仅在ID存在时加载 */}
         {googleAnalyticsId && (
           <>

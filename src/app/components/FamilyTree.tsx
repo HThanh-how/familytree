@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { FamilyData, Person } from '@/types/family';
+import Image from 'next/image';
 import { UserIcon, CalendarIcon, UserGroupIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { highlightMatch } from '@/utils/search';
 
@@ -27,7 +28,7 @@ const createPersonMap = (data: FamilyData) => {
 // Create a map for looking up a person's children
 const createSonsMap = (data: FamilyData) => {
     const map = new Map<string, Person[]>();
-    
+
     // Initialize children array for each person
     data.generations.forEach(generation => {
         generation.people.forEach(person => {
@@ -36,7 +37,7 @@ const createSonsMap = (data: FamilyData) => {
             }
         });
     });
-    
+
     // Fill children array based on fatherId
     data.generations.forEach(generation => {
         generation.people.forEach(person => {
@@ -48,19 +49,19 @@ const createSonsMap = (data: FamilyData) => {
             }
         });
     });
-    
+
     return map;
 };
 
-const PersonCard = ({ 
-    person, 
+const PersonCard = ({
+    person,
     personMap,
     sonsMap,
     scrollToPerson,
     searchTerm,
     searchInInfo
-}: { 
-    person: Person; 
+}: {
+    person: Person;
     personMap: Map<string, Person>;
     sonsMap: Map<string, Person[]>;
     scrollToPerson: (personId: string) => void;
@@ -73,7 +74,7 @@ const PersonCard = ({
 
     const toggleExpand = (e: React.MouseEvent) => {
         // Prevent toggling card when clicking on buttons
-        if ((e.target as HTMLElement).tagName === 'BUTTON' || 
+        if ((e.target as HTMLElement).tagName === 'BUTTON' ||
             (e.target as HTMLElement).closest('button')) {
             return;
         }
@@ -81,8 +82,8 @@ const PersonCard = ({
     };
 
     return (
-        <div 
-            id={`person-${person.id}`} 
+        <div
+            id={`person-${person.id}`}
             className={`group bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 hover:border-blue-100 relative overflow-hidden cursor-pointer ${expanded ? 'ring-1 ring-blue-300' : ''}`}
             onClick={toggleExpand}
         >
@@ -93,11 +94,15 @@ const PersonCard = ({
                         {/* Avatar: use image if avatarUrl exists, otherwise use initial */}
                         <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 text-blue-700 font-semibold border border-blue-100 overflow-hidden group-hover:bg-blue-100 transition-colors duration-300">
                             {person.avatarUrl ? (
-                                <img
-                                    src={person.avatarUrl}
-                                    alt={person.name}
-                                    className="w-full h-full object-cover"
-                                />
+                                <div className="relative w-full h-full">
+                                    <Image
+                                        src={person.avatarUrl}
+                                        alt={person.name}
+                                        fill
+                                        sizes="(max-width: 768px) 100vw, 40px"
+                                        className="object-cover"
+                                    />
+                                </div>
                             ) : (
                                 <span>
                                     {person.name && person.name.length > 0
@@ -107,24 +112,24 @@ const PersonCard = ({
                             )}
                         </div>
                         <h3 className="text-xl font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-300">
-                            <span dangerouslySetInnerHTML={{ 
-                                __html: searchTerm ? highlightMatch(person.name, searchTerm) : person.name 
+                            <span dangerouslySetInnerHTML={{
+                                __html: searchTerm ? highlightMatch(person.name, searchTerm) : person.name
                             }} />
                         </h3>
                     </div>
                     <div className="text-gray-400">
-                        {expanded ? 
-                            <ChevronUpIcon className="h-5 w-5" /> : 
+                        {expanded ?
+                            <ChevronUpIcon className="h-5 w-5" /> :
                             <ChevronDownIcon className="h-5 w-5" />
                         }
                     </div>
                 </div>
-                
+
                 {father && (
                     <div className="flex items-center gap-2 text-gray-600 text-sm mb-2">
                         <UserGroupIcon className="h-4 w-4 text-blue-500" />
                         <span>Cha:</span>
-                        <button 
+                        <button
                             onClick={(e) => {
                                 e.stopPropagation();
                                 if (father.id) {
@@ -137,14 +142,14 @@ const PersonCard = ({
                         </button>
                     </div>
                 )}
-                
+
                 {sons.length > 0 && (
                     <div className="flex flex-wrap items-center gap-2 text-gray-600 text-sm mb-2">
                         <UserGroupIcon className="h-4 w-4 text-green-500" />
                         <span>Con cháu:</span>
                         {sons.map((son, index) => (
                             <span key={son.id || index}>
-                                <button 
+                                <button
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         if (son.id) {
@@ -160,10 +165,10 @@ const PersonCard = ({
                         ))}
                     </div>
                 )}
-                
+
                 <p className={`text-gray-600 text-sm leading-relaxed mb-3 ${expanded ? '' : 'line-clamp-3'}`}>
-                    <span dangerouslySetInnerHTML={{ 
-                        __html: (searchTerm && searchInInfo) ? highlightMatch(person.info, searchTerm) : person.info 
+                    <span dangerouslySetInnerHTML={{
+                        __html: (searchTerm && searchInInfo) ? highlightMatch(person.info, searchTerm) : person.info
                     }} />
                 </p>
                 {(person.birthYear || person.deathYear) && (
@@ -181,17 +186,17 @@ const PersonCard = ({
     );
 };
 
-const Generation = ({ 
-    title, 
-    people, 
+const Generation = ({
+    title,
+    people,
     personMap,
     sonsMap,
     scrollToPerson,
     searchTerm,
     searchInInfo
-}: { 
-    title: string; 
-    people: Person[]; 
+}: {
+    title: string;
+    people: Person[];
     personMap: Map<string, Person>;
     sonsMap: Map<string, Person[]>;
     scrollToPerson: (personId: string) => void;
@@ -208,9 +213,9 @@ const Generation = ({
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {people.map((person, index) => (
-                    <PersonCard 
-                        key={index} 
-                        person={person} 
+                    <PersonCard
+                        key={index}
+                        person={person}
                         personMap={personMap}
                         sonsMap={sonsMap}
                         scrollToPerson={scrollToPerson}
@@ -226,12 +231,12 @@ const Generation = ({
 export default function FamilyTree({ familyData, searchTerm, searchInInfo }: FamilyTreeProps) {
     const [personMap, setPersonMap] = useState<Map<string, Person>>(new Map());
     const [sonsMap, setSonsMap] = useState<Map<string, Person[]>>(new Map());
-    
+
     useEffect(() => {
         setPersonMap(createPersonMap(familyData));
         setSonsMap(createSonsMap(familyData));
     }, [familyData]);
-    
+
     const scrollToPerson = (personId: string) => {
         const element = document.getElementById(`person-${personId}`);
         if (element) {
@@ -243,7 +248,7 @@ export default function FamilyTree({ familyData, searchTerm, searchInInfo }: Fam
             }, 2000);
         }
     };
-    
+
     return (
         <div className="max-w-7xl mx-auto px-4">
             {familyData.generations.map((generation, index) => (

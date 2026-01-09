@@ -1,221 +1,128 @@
-# Family Tree
+# 🌳 Family Tree - Gia Phả Dòng Họ
 
-English | [中文](./README.zh.md)
+> A modern, professional family tree management system with SSO authentication, role-based access control, and comprehensive data management.
 
-A family tree visualization project built with [Next.js](https://nextjs.org) for displaying and managing your family history and member relationships.
+![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
+![Prisma](https://img.shields.io/badge/Prisma-5-2D3748?logo=prisma)
+![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite)
 
-## Demo Website
+## ✨ Features
 
-You can visit [https://familytree.pomodiary.com/](https://familytree.pomodiary.com/) to see an online demonstration of this project.
+### Core
+- 📊 **3 View Modes**: List, Tree, and Binary Tree visualizations
+- 🔍 **Advanced Search**: Filter by name, info, year range, and generation
+- 🌙 **Dark Mode**: Auto-detect system preference or manual toggle
 
-## Features
+### Authentication & Authorization
+- 🔐 **Authentik SSO**: Enterprise-grade Single Sign-On integration
+- 👥 **RBAC**: Role-Based Access Control with granular permissions
+- 🚀 **First-Run Wizard**: Web-based configuration, no `.env` needed for SSO
 
-- Visual representation of multiple generations of family members
-- Relationship connections between family members
-- Detailed personal information records
-- Optional login authentication mechanism
-- Fully customizable interface and data
+### Data Management
+- 💾 **SQLite Database**: Lightweight, file-based persistence
+- 📇 **Flexible Schema**: Contacts (phone, email, address), custom attributes
+- 📜 **Audit Logging**: Track all data changes with user info
 
-## Quick Start
+### Performance & Developer Experience
+- ⚡ **In-Memory Cache**: Redis-like caching with auto-invalidation
+- 🔄 **SWR**: Stale-while-revalidate for instant UI updates
+- 🖼️ **Image Optimization**: Automatic WebP/AVIF conversion
+- 🐳 **Docker Ready**: Production-optimized containerization
 
-### Install Dependencies
+## 🚀 Quick Start
+
+### Development
 
 ```bash
+# Install dependencies
 npm install
-# or
-yarn install
-# or
-pnpm install
-# or
-bun install
-```
 
-### Configure the Project
+# Initialize database
+npx prisma migrate dev
+npx prisma db seed
 
-1. Copy the environment variable template and configure it:
-
-```bash
-cp .env.local.example .env.local
-```
-
-2. Set your configurations in the `.env.local` file:
-
-```
-# Whether login authentication is required (true/false)
-NEXT_PUBLIC_REQUIRE_AUTH=false
-
-# Authentication mode (all: allow all family members, specific: only allow specific names)
-AUTH_MODE=specific
-# Specific user login name
-SPECIFIC_NAME=白景琦
-
-# Surname configuration (for website title, description, and footer)
-NEXT_PUBLIC_FAMILY_NAME=白
-
-# Application port configuration
-PORT=3000
-```
-
-### Add Family Data
-
-1. Create your family data file `family-data.json` in the `config` directory, you can refer to `family-data.example.json` or `family-data.json`.
-
-2. Add your family member information in the following format:
-
-```json
-{
-  "generations": [
-    {
-      "title": "First Generation",
-      "people": [
-        {
-          "id": "person-id",
-          "name": "Name",
-          "info": "Person description",
-          "fatherId": "Father's ID",
-          "birthYear": 1900,
-          "deathYear": 1980
-        }
-      ]
-    }
-  ]
-}
-```
-
-Field descriptions:
-- `id`: Unique identifier for each person, used to establish relationships
-- `name`: Name
-- `info`: Personal description, life summary, etc.
-- `fatherId`: Father's ID, used to establish generational relationships
-- `birthYear`: Birth year (optional)
-- `deathYear`: Death year (optional)
-
-### Run the Project
-
-```bash
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to view your family tree.
+Open [http://localhost:4000](http://localhost:4000)
 
-## Data Format Details
+### Docker Deployment
 
-Family data is stored in JSON format, organized by generations:
+```bash
+# Build and run
+docker-compose up -d
 
-- Each generation has a title and a group of people
-- Each person includes ID, name, information, and father's ID
-- Parent-child relationships are established through `fatherId`
-- You can add spouse, children, and other important information in the info field
-
-Example:
-```json
-{
-  "generations": [
-    {
-      "title": "First Generation",
-      "people": [
-        {
-          "id": "ancestor",
-          "name": "Ancestor",
-          "info": "Family founder, born in 1850",
-          "birthYear": 1850
-        }
-      ]
-    },
-    {
-      "title": "Second Generation",
-      "people": [
-        {
-          "id": "second-gen-1",
-          "name": "First Son",
-          "info": "Born in 1880, wife Wang",
-          "fatherId": "ancestor",
-          "birthYear": 1880,
-          "deathYear": 1950
-        },
-        {
-          "id": "second-gen-2",
-          "name": "Second Son",
-          "info": "Born in 1885, wife Li",
-          "fatherId": "ancestor",
-          "birthYear": 1885,
-          "deathYear": 1960
-        }
-      ]
-    }
-  ]
-}
+# First time: Run migrations
+docker exec -it familytree-app-1 npx prisma migrate deploy
 ```
 
-## Using AI to Generate Family Data
+Open [http://localhost:3000](http://localhost:3000)
 
-If you have a large amount of family data to organize, you can use AI to help you quickly generate JSON data in the correct format:
+## 🔧 Configuration
 
-1. Prepare your family information text, including names, relationships, and relevant information for each generation
-2. Provide the following format guide to AI (such as DeepSeek, ChatGPT, Claude, etc.):
+### First-Run Setup (Recommended)
+1. Start the application
+2. Navigate to any page → Redirected to `/setup`
+3. Enter Authentik credentials:
+   - **Issuer URL**: `https://your-authentik.com/application/o/your-app/`
+   - **Client ID**: From Authentik admin
+   - **Client Secret**: From Authentik admin
+   - **Auth Secret**: Generate with `openssl rand -base64 32`
+4. Click "Save" → Restart server → SSO ready!
 
-```
-Please organize the family information I provide into the following JSON format:
-{
-  "generations": [
-    {
-      "title": "Xth Generation",
-      "people": [
-        {
-          "id": "unique-identifier",
-          "name": "Name",
-          "info": "Detailed information",
-          "fatherId": "Father's ID",
-          "birthYear": birth year,
-          "deathYear": death year
-        }
-      ]
-    }
-  ]
-}
+### Environment Variables (Optional)
+Create `.env` file for local development:
 
-Requirements:
-1. Generate a unique id for each person (such as first-gen-1, second-gen-2, etc.)
-2. Correctly set fatherId to establish parent-child relationships
-3. Categorize people by generation
-4. Include spouse, achievements, etc. in the info field
-5. Use birthYear and deathYear to record birth and death years (if available)
-6. Ensure the JSON format is valid and can be directly imported into the system
+```env
+DATABASE_URL="file:./dev.db"
+AUTH_SECRET="your-random-secret"
+AUTH_AUTHENTIK_ID="your-client-id"
+AUTH_AUTHENTIK_SECRET="your-client-secret"
+AUTH_AUTHENTIK_ISSUER="https://auth.example.com/application/o/app/"
 ```
 
-3. Copy the AI-generated JSON to the `config/family-data.json` file
-4. Check and adjust the generated data to ensure relationships are accurate and the format is correct
+## 📁 Project Structure
 
-This method can quickly convert unstructured family information into the JSON format required by the system, particularly suitable for large amounts of data.
+```
+├── prisma/              # Database schema & migrations
+├── src/
+│   ├── app/
+│   │   ├── admin/       # Admin panel (Users, Roles)
+│   │   ├── api/         # API routes
+│   │   ├── components/  # React components
+│   │   └── setup/       # First-run wizard
+│   ├── lib/             # Utilities (prisma, redis, audit, etc.)
+│   └── hooks/           # Custom React hooks
+├── Dockerfile           # Production container
+└── docker-compose.yml   # Docker orchestration
+```
 
-## Customization and Extension
+## 🔒 Security
 
-- Adjust the data file in `config/family-data.json` to update family information
-- Edit the `.env.local` file to change configuration and authentication methods
+- **RBAC**: Granular permissions (view, edit, delete, manage)
+- **Rate Limiting**: Built-in API protection
+- **Audit Trail**: All changes logged with timestamp & user
+- **HTTPS Ready**: Configure reverse proxy (nginx/Caddy)
 
-## Deployment
+## 📊 API Endpoints
 
-It is recommended to deploy your family tree project using the [Vercel platform](https://vercel.com/new):
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/health` | Health check for load balancers |
+| `GET /api/family-data` | Family tree data (cached) |
+| `GET /api/setup` | Check configuration status |
+| `POST /api/setup` | Save configuration |
 
-1. Push your code to GitHub/GitLab/Bitbucket
-2. Import your repository on Vercel
-3. Set environment variables
-4. Deploy
+## 🤝 Contributing
 
-## Related Services
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing`)
+5. Open Pull Request
 
-**[FateMaster.AI](https://www.fatemaster.ai)** - AI Chinese astrology website, providing intelligent fortune analysis services.
+## 📄 License
 
-## Contribution
-
-Pull Requests and Issues are welcome to improve this project.
-
-## License
-
-MIT
+This project is private. All rights reserved.
