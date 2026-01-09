@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build:
@@ -8,10 +6,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=file:./data/prod.db
+      - DATABASE_URL=file:/data/prod.db
       - NODE_ENV=production
     volumes:
-      - ./data:/app/data
+      - /var/lib/familytree/data:/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
