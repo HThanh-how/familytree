@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import FamilyTree from './components/FamilyTree';
 import TreeView from './components/TreeView';
 import BinaryTreeView from './components/BinaryTreeView';
@@ -17,9 +18,11 @@ import Link from 'next/link';
 
 
 export default function Home() {
+  const router = useRouter();
   const [viewMode, setViewMode] = useState<'list' | 'tree' | 'binary'>('list');
   const [loading, setLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false); // Can be moved to a context for better management
+  const [isConfigured, setIsConfigured] = useState<boolean | null>(null);
   const { data: familyData, loading: dataLoading, error: dataError } = useFamilyData();
 
   // Auth & Permissions
@@ -112,6 +115,29 @@ export default function Home() {
     setLoading(false);
   }, [applyTheme]);
 
+  // Check setup status
+  useEffect(() => {
+    async function checkSetup() {
+      try {
+        const res = await fetch('/api/setup');
+        const data = await res.json();
+        setIsConfigured(data.configured);
+      } catch {
+        setIsConfigured(false);
+      }
+    }
+    checkSetup();
+  }, []);
+
+  // Handle login - redirect to setup if not configured
+  const handleLogin = useCallback(() => {
+    if (isConfigured === false) {
+      router.push('/setup');
+    } else {
+      signIn("authentik");
+    }
+  }, [isConfigured, router]);
+
   if (loading || dataLoading || status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -158,7 +184,7 @@ export default function Home() {
                 </div>
               ) : (
                 <button
-                  onClick={() => signIn("authentik")}
+                  onClick={handleLogin}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   Đăng nhập
